@@ -36,40 +36,60 @@ void loop() {
       lcd.setBacklight(5);
       
       lcd.createChar(0, upPerson1x3);
+      lcd.createChar(1, upPerson1x3);
+      lcd.createChar(2, upPerson1x3);
       lcd.setCursor(0, 1);
       lcd.write(0);
+      lcd.write(1);
+      lcd.write(2);
     }
     if (buttons & BUTTON_DOWN) {
       lcd.print("DOWN ");
       lcd.setBacklight(1);
 
       lcd.createChar(0, downPerson1x4);
+      lcd.createChar(1, downPerson1x4);
+      lcd.createChar(2, downPerson1x4);
       lcd.setCursor(0, 1);
       lcd.write(0);
+      lcd.write(1);
+      lcd.write(2);
     }
     if (buttons & BUTTON_LEFT) {
       lcd.print("LEFT ");
       lcd.setBacklight(2);
 
       lcd.createChar(0, leftPerson1x2);
+      lcd.createChar(1, leftPerson1x2);
+      lcd.createChar(2, leftPerson1x2);
       lcd.setCursor(0, 1);
       lcd.write(0);
+      lcd.write(1);
+      lcd.write(2);
     }
     if (buttons & BUTTON_RIGHT) {
       lcd.print("RIGHT ");
       lcd.setBacklight(3);
 
       lcd.createChar(0, rightPerson1x1);
+      lcd.createChar(1, rightPerson1x1);
+      lcd.createChar(2, rightPerson1x1);
       lcd.setCursor(0, 1);
       lcd.write(0);
+      lcd.write(1);
+      lcd.write(2);
     }
     if (buttons & BUTTON_SELECT) {
       lcd.print("SELECT ");
       lcd.setBacklight(4);
 
       lcd.createChar(0, straightPerson1x0);
+      lcd.createChar(1, straightPerson1x0);
+      lcd.createChar(2, straightPerson1x0);
       lcd.setCursor(0, 1);
       lcd.write(0);
+      lcd.write(1);
+      lcd.write(2);
     }
   }
 }
