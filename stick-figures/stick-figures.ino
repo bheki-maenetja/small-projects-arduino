@@ -1,7 +1,7 @@
 #include <Wire.h>
 #include <Adafruit_RGBLCDShield.h> 
 #include <utility/Adafruit_MCP23017.h>
-#include <strings.h>
+#include <string.h>
 
 Adafruit_RGBLCDShield lcd = Adafruit_RGBLCDShield ();
 
@@ -34,32 +34,27 @@ void loop() {
     if (buttons & BUTTON_UP) {
       lcd.print("UP ");
       lcd.setBacklight(YELLOW);
-//      chosenPerson1x0 = upPerson1x3;
-      bcopy(upPerson1x3, chosenPerson);
+      memmove(chosenPerson, upPerson1x3, 8);
     }
     if (buttons & BUTTON_DOWN) {
       lcd.print("DOWN ");
       lcd.setBacklight(RED);
-//      chosenPerson = downPerson1x4;
-      bcopy(downPerson1x4, chosenPerson);
+      memmove(chosenPerson, downPerson1x4, 8);
     }
     if (buttons & BUTTON_LEFT) {
       lcd.print("LEFT ");
       lcd.setBacklight(TEAL);
-//      chosenPerson = leftPerson1x2;
-      bcopy(leftPerson1x2, chosenPerson);
+      memmove(chosenPerson, leftPerson1x2, 8);
     }
     if (buttons & BUTTON_RIGHT) {
       lcd.print("RIGHT ");
       lcd.setBacklight(GREEN);
-//      chosenPerson = rightPerson1x1;
-      bcopy(rightPerson1x1, chosenPerson);
+      memmove(chosenPerson, rightPerson1x1, 8);
     }
     if (buttons & BUTTON_SELECT) {
       lcd.print("SELECT ");
       lcd.setBacklight(VIOLET);
-//      chosenPerson = straightPerson1x0;
-      bcopy(straightPerson1x0, chosenPerson);
+      memmove(chosenPerson, straightPerson1x0, 8);
     }
     lcd.createChar(0, chosenPerson);
     lcd.createChar(1, chosenPerson);
