@@ -1,8 +1,6 @@
 #include <Wire.h>
 #include <Adafruit_RGBLCDShield.h> 
 #include <utility/Adafruit_MCP23017.h>
-#include <LiquidCrystal.h>
-#include <GKScroll.h>
 
 Adafruit_RGBLCDShield lcd = Adafruit_RGBLCDShield ();
 unsigned long myTime;
