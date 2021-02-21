@@ -11,6 +11,8 @@ void setup() {
   lcd.begin(16,2);
   lcd.setCursor(1,0);
   lcd.print("Hello Worlds!");
+  lcd.setCursor(1,1);
+  lcd.print("C/C++ is great!");
 }
 
 void loop() {
@@ -22,5 +24,5 @@ void loop() {
   } else if (demButtons & BUTTON_RIGHT) {
     lcd.scrollDisplayRight();
   }
-  delay(100);
+  delay(150);
 }
