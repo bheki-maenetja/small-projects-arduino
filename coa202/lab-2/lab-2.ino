@@ -15,11 +15,6 @@ void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600);
   lcd.begin(16,2);
-//  lcd.setCursor(0,0);
-//  lcd.print("I am learning");
-//  lcd.setCursor(0,1);
-//  lcd.print("Wazzup!!!");
-  
 }
 
 void loop() {
