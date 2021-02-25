@@ -28,9 +28,9 @@ void loop() {
    uint8_t buttons = lcd.readButtons();
    if (buttons) {
       lcd.clear();
-      if (buttons & BUTTON_UP) {
+      if ((buttons & BUTTON_UP) && count < 50) {
         count++;
-      } else if (buttons & BUTTON_DOWN) {
+      } else if ((buttons & BUTTON_DOWN) && count > -50) {
         count--;
       } else if (buttons & BUTTON_SELECT) {
         Serial.println(count);
