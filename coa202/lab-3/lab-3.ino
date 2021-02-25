@@ -13,13 +13,29 @@ Adafruit_RGBLCDShield lcd = Adafruit_RGBLCDShield ();
 #define VIOLET 0x5
 #define WHITE 0x7
 
+int count = 0;
+
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600);
   lcd.begin(16,2);
+  lcd.setCursor(0,0);
+  lcd.print(count);
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
-
+   uint8_t buttons = lcd.readButtons();
+   if (buttons) {
+      lcd.clear();
+      if (buttons & BUTTON_UP) {
+        count++;
+      } else if (buttons & BUTTON_DOWN) {
+        count--;
+      } else if (buttons & BUTTON_SELECT) {
+        Serial.println(count);
+      }
+      lcd.print(count);
+      delay(250);
+   }
 }
