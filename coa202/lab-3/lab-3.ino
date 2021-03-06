@@ -15,11 +15,17 @@ Adafruit_RGBLCDShield lcd = Adafruit_RGBLCDShield ();
 
 int count = 0;
 int count_2 = 0;
+int count_3 = 0;
+
 int tick_speed = 250;
 
 bool isPressed;
 int currentTime = 0;
 int pressedTime = 0;
+
+enum button_state {pressed = 'p', holding = 'h', idle = 'i'};
+button_state current_state;
+button_state old_state;
 
 void setup() {
   // put your setup code here, to run once:
@@ -32,7 +38,8 @@ void setup() {
 void loop() {
   // put your main code here, to run repeatedly:
 //  standard_increment();
-  speedup_increment();
+//  speedup_increment();
+  static_increment();
 }
 
 void standard_increment() {
@@ -80,5 +87,43 @@ void speedup_increment() {
     pressedTime = 0;
     isPressed = false;
     tick_speed = 250;
+  }
+}
+
+void static_increment() {
+  uint8_t buttons = lcd.readButtons();
+  
+  if ((buttons & BUTTON_UP) || (buttons & BUTTON_DOWN)) {
+    old_state = current_state;
+    if (not isPressed) {
+      pressedTime = millis();
+      isPressed = true;
+      current_state = pressed;
+    } else if (isPressed) {
+      currentTime = millis();
+      if ((currentTime - pressedTime) > 2000) {
+        current_state = holding;
+      }
+    }
+  } else {
+    pressedTime = 0;
+    currentTime = 0;
+    isPressed = false;
+    old_state = current_state;
+    current_state = idle;
+  }
+
+  Serial.println(char(current_state));
+  if ((current_state == pressed && old_state == idle) || (current_state == holding)) {
+    if (buttons & BUTTON_UP) {
+      count_3++;
+    } else if (buttons & BUTTON_DOWN) {
+      count_3--;
+    }
+    lcd.clear();
+    lcd.print(count_3);
+    if (current_state == holding) {
+      delay(250);
+    }
   }
 }
