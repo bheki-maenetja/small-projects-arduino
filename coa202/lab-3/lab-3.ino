@@ -14,6 +14,12 @@ Adafruit_RGBLCDShield lcd = Adafruit_RGBLCDShield ();
 #define WHITE 0x7
 
 int count = 0;
+int count_2 = 0;
+int tick_speed = 250;
+
+bool isPressed;
+int currentTime = 0;
+int pressedTime = 0;
 
 void setup() {
   // put your setup code here, to run once:
@@ -25,7 +31,12 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
-   uint8_t buttons = lcd.readButtons();
+//  standard_increment();
+  speedup_increment();
+}
+
+void standard_increment() {
+  uint8_t buttons = lcd.readButtons();
    if (buttons) {
       lcd.clear();
       if ((buttons & BUTTON_UP) && count < 50) {
@@ -38,4 +49,36 @@ void loop() {
       lcd.print(count);
       delay(250);
    }
+}
+
+void speedup_increment() {
+  uint8_t buttons = lcd.readButtons();
+
+  if ((buttons & BUTTON_UP) || (buttons & BUTTON_DOWN)) {
+    lcd.clear();
+    if (not isPressed) {
+      pressedTime = millis();
+      isPressed = true;
+      Serial.println("Pressed");
+    } else if (isPressed) {
+      currentTime = millis();
+      if ((currentTime - pressedTime) > 3000) {
+        Serial.println("Holding");
+        tick_speed = 100;
+      }
+    }
+
+    if (buttons & BUTTON_UP) {
+      count_2++;
+    } else if (buttons & BUTTON_DOWN) {
+      count_2--;
+    }
+    lcd.print(count_2);
+    delay(tick_speed);
+  } else {
+    currentTime = 0;
+    pressedTime = 0;
+    isPressed = false;
+    tick_speed = 250;
+  }
 }
