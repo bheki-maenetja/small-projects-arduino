@@ -13,11 +13,15 @@ Adafruit_RGBLCDShield lcd = Adafruit_RGBLCDShield ();
 #define VIOLET 0x5
 #define WHITE 0x7
 
+char * message = malloc(50);
+
+enum button_state {pressed = 'p', holding = 'h', idle = 'i'};
+button_state current_state;
+button_state old_state;
+
 int pressedTime;
-int releasedTime;
 int currentTime;
-int short_press_time = 500;
-int long_press_time = 5000;
+int press_time = 2000;
 bool isPressed = false;
 
 void setup() {
@@ -25,6 +29,9 @@ void setup() {
   Serial.begin(9600);
   lcd.begin(16,2);
   lcd.setCursor(0,0);
+  current_state = idle;
+  strcpy(message, "Idle");
+  lcd.print(message);
 }
 
 void loop() {
@@ -32,19 +39,31 @@ void loop() {
   uint8_t buttons = lcd.readButtons();
 
   if (buttons & BUTTON_SELECT) {
+    old_state = current_state;
     if (not isPressed) {
-      Serial.println("Select button pressed!");
-      isPressed = true;
       pressedTime = millis();
+      strcpy(message, "Pressed");
+      isPressed = true;
+      current_state = pressed;
     } else if (isPressed) {
       currentTime = millis();
-      if ((currentTime - pressedTime) > long_press_time) {
-        Serial.println("User is holding it down!");
+      if ((currentTime - pressedTime) > press_time) {
+        strcpy(message, "Holding");
+        current_state = holding;
       }
     }
   } else {
     pressedTime = 0;
     currentTime = 0;
     isPressed = false;
+    strcpy(message, "Idle");
+    old_state = current_state;
+    current_state = idle;
+  }
+
+  Serial.println(char(current_state));
+  if (current_state != old_state) {
+    lcd.clear();
+    lcd.print(message); 
   }
 }
