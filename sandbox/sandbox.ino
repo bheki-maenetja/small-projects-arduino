@@ -1,6 +1,6 @@
 // Boilerplate code for a new project
 #include <Wire.h>
-#include <Adafruit_RGBLCDShield.h> 
+#include <Adafruit_RGBLCDShield.h>
 #include <utility/Adafruit_MCP23017.h>
 #include <string.h>
 
@@ -17,7 +17,7 @@ Adafruit_RGBLCDShield lcd = Adafruit_RGBLCDShield ();
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600);
-  lcd.begin(16,2);
+  lcd.begin(16, 2);
 }
 
 void loop() {

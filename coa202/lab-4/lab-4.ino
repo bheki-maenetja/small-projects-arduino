@@ -1,6 +1,6 @@
 // Boilerplate code for a new project
 #include <Wire.h>
-#include <Adafruit_RGBLCDShield.h> 
+#include <Adafruit_RGBLCDShield.h>
 #include <utility/Adafruit_MCP23017.h>
 #include <string.h>
 
@@ -20,8 +20,8 @@ char *btn_sequence[] = { "0", "0", "0" };
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600);
-  lcd.begin(16,2);
-  lcd.setCursor(0,0);
+  lcd.begin(16, 2);
+  lcd.setCursor(0, 0);
   change_message("locked");
 }
 
@@ -34,31 +34,36 @@ void loop() {
 
   if (button_changes & BUTTON_LEFT) {
     if (btn_sequence[0] != "L") {
-        btn_sequence[0] = "L";
+      btn_sequence[0] = "L";
     } else {
-        reset_sequence();
+      reset_sequence();
     }
   }
   if (button_changes & BUTTON_RIGHT) {
     if (btn_sequence[0] == "L" && btn_sequence[1] != "R") {
-        btn_sequence[1] = "R";
+      btn_sequence[1] = "R";
     } else {
-        reset_sequence();
+      reset_sequence();
     }
   }
 
   if ((button_changes & BUTTON_UP) && (button_changes & BUTTON_DOWN)) {
     Serial.println("TRUE");
     if (btn_sequence[0] == "L" && btn_sequence[1] == "R" && btn_sequence[2] != "UD") {
-        btn_sequence[2] = "UD";
+      btn_sequence[2] = "UD";
     } else {
-        reset_sequence();
+      reset_sequence();
     }
   }
 
   if (old_buttons != buttons) {
     check_sequence();
   }
+
+  //  if (millis() % 50 == 0) {
+  //    lcd.scrollDisplayLeft();
+  //  }
+
   print_elems();
   old_buttons = buttons;
 }
@@ -78,7 +83,7 @@ void check_sequence() {
   for (int i = 0; i < 3; i++) {
     if (btn_sequence[i] == "0") {
       change_message("locked");
-      return; 
+      return;
     }
   }
   change_message("unlocked");
@@ -87,5 +92,5 @@ void check_sequence() {
 void reset_sequence() {
   btn_sequence[0] = "0";
   btn_sequence[1] = "0";
-   btn_sequence[2] = "0";
+  btn_sequence[2] = "0";
 }
