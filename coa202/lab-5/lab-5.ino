@@ -22,7 +22,7 @@ void setup() {
   lcd.begin(16,2);
 
   
-  int result = sum(256);
+  int result = sum(10);
   Serial.println(result);
 }
 
