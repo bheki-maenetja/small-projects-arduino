@@ -24,15 +24,21 @@ void setup() {
   
   int result = sum(10);
   Serial.println(result);
+  lcd.print("Input: ");
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
+  String incoming = Serial.readString();
+  if (incoming != "") {
+    lcd.clear();
+    lcd.print("Input: ");
+    lcd.println(incoming);
+    delay(2000);
+  }
 
 }
 
-#pragma GCC push_options
-#pragma GCC optimize ("O0")
 long sum(int n) {
   long result; 
   if (n == 0) result = 0;
@@ -40,4 +46,3 @@ long sum(int n) {
   lcd.println(result);
   return result;
 }
-#pragma GCC pop_options
