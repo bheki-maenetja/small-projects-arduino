@@ -58,6 +58,7 @@ void setUpHouse(house *houseObj) {
   (*houseObj).floors[0].floor_name = "Ground";
   (*houseObj).floors[1].floor_name = "First";
   (*houseObj).floors[0].rooms[0].room_name = "kitchen";
+  (*houseObj).floors[0].rooms[1].typeName = "Heat";
   (*houseObj).floors[0].rooms[1].room_name = "hall";
-  (*houseObj).floors[0].rooms[2].room_name = "living room";
+  (*houseObj).floors[0].rooms[2].room_name = "living room"; 
 }
