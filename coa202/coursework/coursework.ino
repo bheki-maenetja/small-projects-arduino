@@ -23,11 +23,15 @@ typedef enum room {
   bedroom_2 = 5 
 };
 
+typedef enum house_floor { Ground, First };
+
+typedef enum device_type { light, heat };
+
 typedef struct device {
-  String house_floor;
+  house_floor house_floor;
   room floor_room;
-  String type;
-  String device_name = "Main";
+  device_type type;
+//  String device_name = "Main";
   int on_time = 0;
   int off_time = 0;
   int level = 0;
@@ -41,8 +45,8 @@ void setup() {
   lcd.begin(16, 2);
   setUpHouse();
   for (int i = 0; i < 12; i++) {
-    device d = homeDevices[i];
-    Serial.println(d.house_floor + "/" + d.floor_room + "/" + d.type + "/" + d.device_name);
+    Serial.println(getFloorName(homeDevices[i].house_floor) + "/" + getRoomName(homeDevices[i].floor_room) + "/" + getTypeName(homeDevices[i].type) + "/" + getDeviceName());
+    delay(500);
   }
 }
 
@@ -51,21 +55,77 @@ void loop() {
 }
 
 void setUpHouse() {
-  lcd.println("How we doin folks?");
   for (int i = 0; i < 12; i++) {
     if (i < 6) {
-      homeDevices[i].house_floor = "Ground";
+      homeDevices[i].house_floor = Ground;
       homeDevices[i].floor_room = i % 3;
     } else {
-      homeDevices[i].house_floor = "First";
+      homeDevices[i].house_floor = First;
       homeDevices[i].floor_room = (i % 3) + 3;
     }
 
     if (i % 2 == 0) {
-        homeDevices[i].type = "light";
+        homeDevices[i].type = light;
     } else {
-        homeDevices[i].type = "heat";
+        homeDevices[i].type = heat;
     }
-    
   } 
+}
+
+String getFloorName(house_floor floor) {
+  switch (floor) {
+    case Ground:
+      return "Ground";
+      break;
+    case First:
+      return "First";
+      break;
+    default:
+      return "";
+      break;
+  }
+}
+
+String getTypeName(device_type device) {
+  switch (device) {
+    case light:
+      return "Light";
+      break;
+    case heat:
+      return "Heat";
+      break;
+    default:
+      return "";
+      break;
+  }
+}
+
+String getRoomName(room room) {
+  switch (room) {
+    case kitchen:
+      return "kitchen";
+      break;
+    case living_room:
+      return "living room";
+      break;
+    case hall:
+      return "hall";
+      break;
+    case bathroom:
+      return "bathroom";
+      break;
+    case bedroom_1:
+      return "bedroom 1";
+      break;
+    case bedroom_2:
+      return "bedroom 2";
+      break;
+    default:
+      return "";
+      break;
+  }
+}
+
+String getDeviceName() {
+  return "Main";
 }
