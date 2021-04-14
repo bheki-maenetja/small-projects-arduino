@@ -60,8 +60,7 @@ void loop() {
     old_state = current_state;
     current_state = idle;
   }
-
-  Serial.println(char(current_state));
+  
   if (current_state != old_state) {
     lcd.clear();
     lcd.print(message); 
