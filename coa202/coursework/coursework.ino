@@ -31,7 +31,6 @@ typedef struct device {
   house_floor house_floor;
   room floor_room;
   device_type type;
-//  String device_name = "Main";
   int on_time = 0;
   int off_time = 0;
   int level = 0;
@@ -44,18 +43,17 @@ void setup() {
   Serial.begin(9600);
   lcd.begin(16, 2);
   setUpHouse();
-  for (int i = 0; i < 12; i++) {
-    Serial.println(getFloorName(homeDevices[i].house_floor) + "/" + getRoomName(homeDevices[i].floor_room) + "/" + getTypeName(homeDevices[i].type) + "/" + getDeviceName());
-    delay(500);
-  }
+  delay(100);
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
+  buttonHandler();
 }
 
 void setUpHouse() {
   for (int i = 0; i < 12; i++) {
+//    Serial.println(i);
     if (i < 6) {
       homeDevices[i].house_floor = Ground;
       homeDevices[i].floor_room = i % 3;
@@ -128,4 +126,52 @@ String getRoomName(room room) {
 
 String getDeviceName() {
   return "Main";
+}
+
+void sendToMonitor() {
+  for (int i = 0; i < 12; i++) {
+    Serial.println(
+      getFloorName(homeDevices[i].house_floor) + "/" 
+      + getRoomName(homeDevices[i].floor_room) + "/" 
+      + getTypeName(homeDevices[i].type) + "/" 
+      + getDeviceName()
+    );
+    delay(500);
+  }
+}
+
+
+void buttonHandler() {
+  static int pressedTime;
+  static int currentTime;
+  static uint8_t old_buttons = lcd.readButtons();
+  static bool isPressed = false;
+  uint8_t buttons = lcd.readButtons();
+
+  if (buttons) {
+    if (not isPressed) {
+      pressedTime = millis();
+      Serial.println("Pressed");
+      isPressed = true;
+      if (buttons & BUTTON_UP) {
+        Serial.println("Up");
+      } else if (buttons & BUTTON_LEFT) {
+        Serial.println("Left");
+      } else if (buttons & BUTTON_RIGHT) {
+        Serial.println("Right");
+      } else if (buttons & BUTTON_DOWN) {
+        Serial.println("Down");
+      }
+    } else if (isPressed) {
+      currentTime = millis();
+      if ((currentTime - pressedTime) > 2000) {
+        Serial.println("Holding");
+      }
+    }
+  } else {
+    pressedTime = 0;
+    currentTime = 0;
+    isPressed = false;
+//    Serial.println("Idle");
+  }
 }
