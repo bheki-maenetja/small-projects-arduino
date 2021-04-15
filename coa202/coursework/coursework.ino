@@ -36,6 +36,17 @@ typedef struct device {
   int level = 0;
 };
 
+typedef enum menu_state {
+  floors = 0,
+  rooms = 1,
+  devices = 2,
+  actions = 3
+};
+
+menu_state menu_level;
+
+int level_index = 0;
+
 device homeDevices[12];
 
 void setup() {
@@ -44,6 +55,8 @@ void setup() {
   lcd.begin(16, 2);
   setUpHouse();
   delay(100);
+  menu_level = level_index;
+  getMenuState(menu_level);
 }
 
 void loop() {
@@ -53,7 +66,6 @@ void loop() {
 
 void setUpHouse() {
   for (int i = 0; i < 12; i++) {
-//    Serial.println(i);
     if (i < 6) {
       homeDevices[i].house_floor = Ground;
       homeDevices[i].floor_room = i % 3;
@@ -124,6 +136,27 @@ String getRoomName(room room) {
   }
 }
 
+void getMenuState(menu_state state) {
+  lcd.clear();
+  Serial.println(state);
+  switch(state) {
+    case floors:
+      lcd.print("State: Floors");
+      break;
+    case rooms:
+      lcd.print("State: Rooms");
+      break;
+    case devices:
+      lcd.print("State: Devices");
+      break;
+    case actions:
+      lcd.print("State: Actions");
+      break;
+    default:
+      break;
+  }
+}
+
 String getDeviceName() {
   return "Main";
 }
@@ -151,14 +184,15 @@ void buttonHandler() {
   if (buttons) {
     if (not isPressed) {
       pressedTime = millis();
-      Serial.println("Pressed");
       isPressed = true;
       if (buttons & BUTTON_UP) {
         Serial.println("Up");
       } else if (buttons & BUTTON_LEFT) {
         Serial.println("Left");
+        adjustMenuLevel(false);
       } else if (buttons & BUTTON_RIGHT) {
         Serial.println("Right");
+        adjustMenuLevel(true);
       } else if (buttons & BUTTON_DOWN) {
         Serial.println("Down");
       }
@@ -172,6 +206,14 @@ void buttonHandler() {
     pressedTime = 0;
     currentTime = 0;
     isPressed = false;
-//    Serial.println("Idle");
   }
+}
+
+void adjustMenuLevel(bool increment) {
+  if (increment and menu_level != 3) {
+    menu_level = menu_level + 1;
+  } else if (!increment and menu_level != 0) {
+    menu_level = menu_level - 1;
+  }
+  getMenuState(menu_level);
 }
