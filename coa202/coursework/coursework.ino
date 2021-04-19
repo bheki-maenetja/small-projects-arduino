@@ -14,6 +14,11 @@ Adafruit_RGBLCDShield lcd = Adafruit_RGBLCDShield ();
 #define VIOLET 0x5
 #define WHITE 0x7
 
+typedef enum house_floor { 
+  Ground = 0, 
+  First = 1
+};
+
 typedef enum room { 
   kitchen = 0, 
   living_room = 1,
@@ -23,9 +28,16 @@ typedef enum room {
   bedroom_2 = 5 
 };
 
-typedef enum house_floor { Ground, First };
+typedef enum device_type { 
+  light = 0, 
+  heat = 1 
+};
 
-typedef enum device_type { light, heat };
+typedef enum action {
+  on_time = 0,
+  off_time = 1,
+  level = 2
+};
 
 typedef struct device {
   house_floor house_floor;
@@ -43,9 +55,19 @@ typedef enum menu_state {
   actions = 3
 };
 
-menu_state menu_level;
+typedef struct menu_selection {
+  house_floor current_floor = 0;
+  int num_floors = 2;
+  room current_room = 0;
+  int num_rooms = 6;
+  device_type current_device = 0;
+  int num_devices = 2;
+  action current_action = 0;
+  int num_actions = 3;
+};
 
-int level_index = 0;
+menu_state menu_level;
+menu_selection menu_choice;
 
 device homeDevices[12];
 
@@ -55,7 +77,7 @@ void setup() {
   lcd.begin(16, 2);
   setUpHouse();
   delay(100);
-  menu_level = level_index;
+  menu_level = 0;
   getMenuState(menu_level);
 }
 
@@ -136,21 +158,38 @@ String getRoomName(room room) {
   }
 }
 
+String getActionName(action action) {
+  switch(action) {
+    case on_time:
+      return "On time";
+      break;
+    case off_time:
+      return "Off time";
+      break;
+    case level:
+      return "Level";
+      break;
+    default:
+      return "";
+      break;
+  }
+}
+
 void getMenuState(menu_state state) {
   lcd.clear();
   Serial.println(state);
   switch(state) {
     case floors:
-      lcd.print("State: Floors");
+      lcd.print("Floor: " + getFloorName(menu_choice.current_floor));
       break;
     case rooms:
-      lcd.print("State: Rooms");
+      lcd.print("Room: " + getRoomName(menu_choice.current_room));
       break;
     case devices:
-      lcd.print("State: Devices");
+      lcd.print("Device: " + getTypeName(menu_choice.current_device));
       break;
     case actions:
-      lcd.print("State: Actions");
+      lcd.print("Action: " + getActionName(menu_choice.current_action));
       break;
     default:
       break;
@@ -187,6 +226,7 @@ void buttonHandler() {
       isPressed = true;
       if (buttons & BUTTON_UP) {
         Serial.println("Up");
+        adjustMenuChoice(1);
       } else if (buttons & BUTTON_LEFT) {
         Serial.println("Left");
         adjustMenuLevel(false);
@@ -195,6 +235,7 @@ void buttonHandler() {
         adjustMenuLevel(true);
       } else if (buttons & BUTTON_DOWN) {
         Serial.println("Down");
+        adjustMenuChoice(-1);
       }
     } else if (isPressed) {
       currentTime = millis();
@@ -214,6 +255,46 @@ void adjustMenuLevel(bool increment) {
     menu_level = menu_level + 1;
   } else if (!increment and menu_level != 0) {
     menu_level = menu_level - 1;
+  }
+  getMenuState(menu_level);
+}
+
+void adjustMenuChoice(int increment) {
+  switch(menu_level) {
+    case floors:
+      menu_choice.current_floor = menu_choice.current_floor + increment;
+      if (menu_choice.current_floor < 0) {
+        menu_choice.current_floor = menu_choice.num_floors - 1;
+      } else if (menu_choice.current_floor >= menu_choice.num_floors) {
+        menu_choice.current_floor = 0;
+      }
+      break;
+    case rooms:
+      menu_choice.current_room = menu_choice.current_room + increment;
+      if (menu_choice.current_room < 0) {
+        menu_choice.current_room = menu_choice.num_rooms - 1;
+      } else if (menu_choice.current_room >= menu_choice.num_rooms) {
+        menu_choice.current_room = 0;
+      }
+      break;
+    case devices:
+      menu_choice.current_device = menu_choice.current_device + increment;
+      if (menu_choice.current_device < 0) {
+        menu_choice.current_device = menu_choice.num_devices - 1;
+      } else if (menu_choice.current_device >= menu_choice.num_devices) {
+        menu_choice.current_device = 0;
+      }
+      break;
+    case actions:
+      menu_choice.current_action = menu_choice.current_action + increment;
+      if (menu_choice.current_action < 0) {
+        menu_choice.current_action = menu_choice.num_actions - 1;
+      } else if (menu_choice.current_action >= menu_choice.num_actions) {
+        menu_choice.current_action = 0;
+      }
+      break;
+    default:
+      break;
   }
   getMenuState(menu_level);
 }
