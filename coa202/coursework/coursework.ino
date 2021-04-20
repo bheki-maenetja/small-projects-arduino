@@ -262,20 +262,10 @@ void adjustMenuLevel(bool increment) {
 void adjustMenuChoice(int increment) {
   switch(menu_level) {
     case floors:
-      menu_choice.current_floor = menu_choice.current_floor + increment;
-      if (menu_choice.current_floor < 0) {
-        menu_choice.current_floor = menu_choice.num_floors - 1;
-      } else if (menu_choice.current_floor >= menu_choice.num_floors) {
-        menu_choice.current_floor = 0;
-      }
+      adjustFloor(increment);
       break;
     case rooms:
-      menu_choice.current_room = menu_choice.current_room + increment;
-      if (menu_choice.current_room < 0) {
-        menu_choice.current_room = menu_choice.num_rooms - 1;
-      } else if (menu_choice.current_room >= menu_choice.num_rooms) {
-        menu_choice.current_room = 0;
-      }
+      adjustRoom(increment);
       break;
     case devices:
       menu_choice.current_device = menu_choice.current_device + increment;
@@ -297,4 +287,37 @@ void adjustMenuChoice(int increment) {
       break;
   }
   getMenuState(menu_level);
+}
+
+void adjustFloor(int increment) {
+  menu_choice.current_floor = menu_choice.current_floor + increment;
+  if (menu_choice.current_floor < 0) {
+    menu_choice.current_floor = menu_choice.num_floors - 1;
+  } else if (menu_choice.current_floor >= menu_choice.num_floors) {
+    menu_choice.current_floor = 0;
+  }
+
+  if (menu_choice.current_floor == 0) {
+    menu_choice.current_room = 0;
+  } else if (menu_choice.current_floor == 1) {
+    menu_choice.current_room = 3;
+  }
+}
+
+void adjustRoom(int increment) {
+  menu_choice.current_room = menu_choice.current_room + increment;
+  int min_value, max_value;
+  if (menu_choice.current_floor == 0) {
+    min_value = 0;
+    max_value = 2;
+  } else if (menu_choice.current_floor == 1) {
+    min_value = 3;
+    max_value = 5; 
+  }
+
+  if (menu_choice.current_room < min_value) {
+    menu_choice.current_room = max_value;
+  } else if (menu_choice.current_room > max_value) {
+    menu_choice.current_room = min_value;
+  }
 }
