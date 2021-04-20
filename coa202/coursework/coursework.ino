@@ -52,7 +52,8 @@ typedef enum menu_state {
   floors = 0,
   rooms = 1,
   devices = 2,
-  actions = 3
+  actions = 3,
+  values = 4
 };
 
 typedef struct menu_selection {
@@ -191,6 +192,8 @@ void getMenuState(menu_state state) {
     case actions:
       lcd.print("Action: " + getActionName(menu_choice.current_action));
       break;
+    case values:
+      lcd.print(getActionName(menu_choice.current_action) + ": " + "0");
     default:
       break;
   }
@@ -206,7 +209,22 @@ void sendToMonitor() {
       getFloorName(homeDevices[i].house_floor) + "/" 
       + getRoomName(homeDevices[i].floor_room) + "/" 
       + getTypeName(homeDevices[i].type) + "/" 
-      + getDeviceName()
+      + getDeviceName() + "/"
+      + "On: " + homeDevices[i].on_time 
+    );
+    Serial.println(
+      getFloorName(homeDevices[i].house_floor) + "/" 
+      + getRoomName(homeDevices[i].floor_room) + "/" 
+      + getTypeName(homeDevices[i].type) + "/" 
+      + getDeviceName() + "/"
+      + "Off: " + homeDevices[i].off_time 
+    );
+    Serial.println(
+      getFloorName(homeDevices[i].house_floor) + "/" 
+      + getRoomName(homeDevices[i].floor_room) + "/" 
+      + getTypeName(homeDevices[i].type) + "/" 
+      + getDeviceName() + "/"
+      + "Level: " + homeDevices[i].level 
     );
     delay(500);
   }
@@ -236,6 +254,8 @@ void buttonHandler() {
       } else if (buttons & BUTTON_DOWN) {
         Serial.println("Down");
         adjustMenuChoice(-1);
+      } else if (buttons & BUTTON_SELECT) {
+        sendToMonitor();
       }
     } else if (isPressed) {
       currentTime = millis();
@@ -251,7 +271,7 @@ void buttonHandler() {
 }
 
 void adjustMenuLevel(bool increment) {
-  if (increment and menu_level != 3) {
+  if (increment and menu_level != 4) {
     menu_level = menu_level + 1;
   } else if (!increment and menu_level != 0) {
     menu_level = menu_level - 1;
