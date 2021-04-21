@@ -178,7 +178,6 @@ String getActionName(action action) {
 
 void getMenuState(menu_state state) {
   lcd.clear();
-  Serial.println(state);
   switch(state) {
     case floors:
       lcd.print("Floor: " + getFloorName(menu_choice.current_floor));
@@ -227,13 +226,13 @@ void printDeviceInfo(device home_device) {
   );
 }
 
-void getCurrentDevice() {
+device getCurrentDevice() {
   for (int i = 0; i < 12; i++) {
     bool deviceFound = homeDevices[i].house_floor == menu_choice.current_floor 
                        && homeDevices[i].floor_room == menu_choice.current_room
                        && homeDevices[i].type == menu_choice.current_device;
     if (deviceFound) {
-       printDeviceInfo(homeDevices[i]);  
+       return homeDevices[i];  
     }
   }
 }
@@ -251,19 +250,19 @@ void buttonHandler() {
       pressedTime = millis();
       isPressed = true;
       if (buttons & BUTTON_UP) {
-        Serial.println("Up");
+//        Serial.println("Up");
         adjustMenuChoice(1);
       } else if (buttons & BUTTON_LEFT) {
-        Serial.println("Left");
+//        Serial.println("Left");
         adjustMenuLevel(false);
       } else if (buttons & BUTTON_RIGHT) {
-        Serial.println("Right");
+//        Serial.println("Right");
         adjustMenuLevel(true);
       } else if (buttons & BUTTON_DOWN) {
-        Serial.println("Down");
+//        Serial.println("Down");
         adjustMenuChoice(-1);
       } else if (buttons & BUTTON_SELECT) {
-        getCurrentDevice();
+        printDeviceInfo(getCurrentDevice());
       }
     } else if (isPressed) {
       currentTime = millis();
@@ -311,6 +310,9 @@ void adjustMenuChoice(int increment) {
         menu_choice.current_action = 0;
       }
       break;
+    case values:
+      adjustDeviceValue(increment);
+      break;
     default:
       break;
   }
@@ -347,5 +349,20 @@ void adjustRoom(int increment) {
     menu_choice.current_room = max_value;
   } else if (menu_choice.current_room > max_value) {
     menu_choice.current_room = min_value;
+  }
+}
+
+void adjustDeviceValue(int increment) {
+  device current_device = getCurrentDevice();
+  switch(menu_choice.current_action) {
+    case on_time:
+      break;
+    case off_time:
+      break;
+    case level:
+      current_device.level = current_device.level + increment;
+      Serial.println("Is this working? " + current_device.level);
+    default:
+      break;
   }
 }
