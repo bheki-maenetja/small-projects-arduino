@@ -203,30 +203,38 @@ String getDeviceName() {
   return "Main";
 }
 
-void sendToMonitor() {
+void printDeviceInfo(device home_device) {
+  Serial.println(
+    getFloorName(home_device.house_floor) + "/" 
+    + getRoomName(home_device.floor_room) + "/" 
+    + getTypeName(home_device.type) + "/" 
+    + getDeviceName() + "/"
+    + "On: " + home_device.on_time 
+  );
+  Serial.println(
+    getFloorName(home_device.house_floor) + "/" 
+    + getRoomName(home_device.floor_room) + "/" 
+    + getTypeName(home_device.type) + "/" 
+    + getDeviceName() + "/"
+    + "Off: " + home_device.off_time 
+  );
+  Serial.println(
+    getFloorName(home_device.house_floor) + "/" 
+    + getRoomName(home_device.floor_room) + "/" 
+    + getTypeName(home_device.type) + "/" 
+    + getDeviceName() + "/"
+    + "Level: " + home_device.level 
+  );
+}
+
+void getCurrentDevice() {
   for (int i = 0; i < 12; i++) {
-    Serial.println(
-      getFloorName(homeDevices[i].house_floor) + "/" 
-      + getRoomName(homeDevices[i].floor_room) + "/" 
-      + getTypeName(homeDevices[i].type) + "/" 
-      + getDeviceName() + "/"
-      + "On: " + homeDevices[i].on_time 
-    );
-    Serial.println(
-      getFloorName(homeDevices[i].house_floor) + "/" 
-      + getRoomName(homeDevices[i].floor_room) + "/" 
-      + getTypeName(homeDevices[i].type) + "/" 
-      + getDeviceName() + "/"
-      + "Off: " + homeDevices[i].off_time 
-    );
-    Serial.println(
-      getFloorName(homeDevices[i].house_floor) + "/" 
-      + getRoomName(homeDevices[i].floor_room) + "/" 
-      + getTypeName(homeDevices[i].type) + "/" 
-      + getDeviceName() + "/"
-      + "Level: " + homeDevices[i].level 
-    );
-    delay(500);
+    bool deviceFound = homeDevices[i].house_floor == menu_choice.current_floor 
+                       && homeDevices[i].floor_room == menu_choice.current_room
+                       && homeDevices[i].type == menu_choice.current_device;
+    if (deviceFound) {
+       printDeviceInfo(homeDevices[i]);  
+    }
   }
 }
 
@@ -255,7 +263,7 @@ void buttonHandler() {
         Serial.println("Down");
         adjustMenuChoice(-1);
       } else if (buttons & BUTTON_SELECT) {
-        sendToMonitor();
+        getCurrentDevice();
       }
     } else if (isPressed) {
       currentTime = millis();
