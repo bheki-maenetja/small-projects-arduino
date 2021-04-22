@@ -43,8 +43,8 @@ typedef struct device {
   house_floor house_floor;
   room floor_room;
   device_type type;
-  int on_time = 0;
-  int off_time = 0;
+  int on_time = 720;
+  int off_time = 720;
   int level = 0;
 };
 
@@ -192,7 +192,20 @@ void getMenuState(menu_state state) {
       lcd.print("Action: " + getActionName(menu_choice.current_action));
       break;
     case values:
-      lcd.print(getActionName(menu_choice.current_action) + ": " + "0");
+      lcd.print(getActionName(menu_choice.current_action) + ": ");
+      switch(menu_choice.current_action) {
+        case on_time:
+          lcd.print(calculateTime((*getCurrentDevice()).on_time));
+          break;
+        case off_time:
+          lcd.print(calculateTime((*getCurrentDevice()).off_time));
+          break;
+        case level:
+          lcd.print((*getCurrentDevice()).level);
+          break;
+        default:
+          break;
+      }
     default:
       break;
   }
@@ -202,37 +215,37 @@ String getDeviceName() {
   return "Main";
 }
 
-void printDeviceInfo(device home_device) {
+void printDeviceInfo(device *home_device) {
   Serial.println(
-    getFloorName(home_device.house_floor) + "/" 
-    + getRoomName(home_device.floor_room) + "/" 
-    + getTypeName(home_device.type) + "/" 
+    getFloorName((*home_device).house_floor) + "/" 
+    + getRoomName((*home_device).floor_room) + "/" 
+    + getTypeName((*home_device).type) + "/" 
     + getDeviceName() + "/"
-    + "On: " + home_device.on_time 
+    + "On: " + calculateTime((*home_device).on_time) 
   );
   Serial.println(
-    getFloorName(home_device.house_floor) + "/" 
-    + getRoomName(home_device.floor_room) + "/" 
-    + getTypeName(home_device.type) + "/" 
+    getFloorName((*home_device).house_floor) + "/" 
+    + getRoomName((*home_device).floor_room) + "/" 
+    + getTypeName((*home_device).type) + "/" 
     + getDeviceName() + "/"
-    + "Off: " + home_device.off_time 
+    + "Off: " + calculateTime((*home_device).off_time) 
   );
   Serial.println(
-    getFloorName(home_device.house_floor) + "/" 
-    + getRoomName(home_device.floor_room) + "/" 
-    + getTypeName(home_device.type) + "/" 
+    getFloorName((*home_device).house_floor) + "/" 
+    + getRoomName((*home_device).floor_room) + "/" 
+    + getTypeName((*home_device).type) + "/" 
     + getDeviceName() + "/"
-    + "Level: " + home_device.level 
+    + "Level: " + (*home_device).level 
   );
 }
 
-device getCurrentDevice() {
+device* getCurrentDevice() {
   for (int i = 0; i < 12; i++) {
     bool deviceFound = homeDevices[i].house_floor == menu_choice.current_floor 
                        && homeDevices[i].floor_room == menu_choice.current_room
                        && homeDevices[i].type == menu_choice.current_device;
     if (deviceFound) {
-       return homeDevices[i];  
+       return &homeDevices[i];  
     }
   }
 }
@@ -353,16 +366,48 @@ void adjustRoom(int increment) {
 }
 
 void adjustDeviceValue(int increment) {
-  device current_device = getCurrentDevice();
+  device *current_device = getCurrentDevice();
   switch(menu_choice.current_action) {
     case on_time:
+      (*current_device).on_time = (*current_device).on_time + 5 * increment;
+      if ((*current_device).on_time < 0) {
+        (*current_device).on_time = 1435;
+      } else if ((*current_device).on_time > 1435) {
+        (*current_device).on_time = 0;
+      }
       break;
     case off_time:
+      (*current_device).off_time = (*current_device).off_time + 5 * increment;
+      if ((*current_device).off_time < 0) {
+        (*current_device).off_time = 1435;
+      } else if ((*current_device).off_time > 1435) {
+        (*current_device).off_time = 0;
+      }
       break;
     case level:
-      current_device.level = current_device.level + increment;
-      Serial.println("Is this working? " + current_device.level);
+      (*current_device).level = (*current_device).level + increment;
+      if ((*current_device).level < 0) {
+        (*current_device).level = 0;
+      } else if ((*current_device).level > 100) {
+        (*current_device).level = 100;
+      }
     default:
       break;
+  }
+}
+
+String calculateTime(int minutes) {
+  int hour_value = floor(minutes / 60);
+  int minute_value = minutes - hour_value * 60;
+  if (hour_value < 10) {
+    if (minute_value < 10) {
+      return "0" + (String) hour_value + ":" + "0" + (String) minute_value;
+    } else {
+      return "0" + (String) hour_value + ":" + (String) minute_value;
+    }
+  } else if (minute_value < 10) {
+      return (String) hour_value + ":" + "0" + (String) minute_value;
+  } else {
+      return (String) hour_value + ":" + (String) minute_value;
   }
 }
