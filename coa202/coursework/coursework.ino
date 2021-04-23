@@ -16,7 +16,8 @@ Adafruit_RGBLCDShield lcd = Adafruit_RGBLCDShield ();
 
 typedef enum house_floor { 
   Ground = 0, 
-  First = 1
+  First = 1,
+  Data = 2
 };
 
 typedef enum room { 
@@ -58,7 +59,7 @@ typedef enum menu_state {
 
 typedef struct menu_selection {
   house_floor current_floor = 0;
-  int num_floors = 2;
+  int num_floors = 3;
   room current_room = 0;
   int num_rooms = 6;
   device_type current_device = 0;
@@ -78,6 +79,7 @@ void setup() {
   lcd.begin(16, 2);
   setUpHouse();
   delay(100);
+  Serial.println("BASIC");
   menu_level = 0;
   getMenuState(menu_level);
 }
@@ -112,6 +114,9 @@ String getFloorName(house_floor floor) {
       break;
     case First:
       return "First";
+      break;
+    case Data:
+      return "Send Data";
       break;
     default:
       return "";
@@ -239,6 +244,12 @@ void printDeviceInfo(device *home_device) {
   );
 }
 
+void sendAllData() {
+  for (int i = 0; i < 12; i++) {
+    printDeviceInfo(&homeDevices[i]);
+  }
+}
+
 device* getCurrentDevice() {
   for (int i = 0; i < 12; i++) {
     bool deviceFound = homeDevices[i].house_floor == menu_choice.current_floor 
@@ -263,16 +274,12 @@ void buttonHandler() {
       pressedTime = millis();
       isPressed = true;
       if (buttons & BUTTON_UP) {
-//        Serial.println("Up");
         adjustMenuChoice(1);
       } else if (buttons & BUTTON_LEFT) {
-//        Serial.println("Left");
         adjustMenuLevel(false);
       } else if (buttons & BUTTON_RIGHT) {
-//        Serial.println("Right");
         adjustMenuLevel(true);
       } else if (buttons & BUTTON_DOWN) {
-//        Serial.println("Down");
         adjustMenuChoice(-1);
       } else if (buttons & BUTTON_SELECT) {
         printDeviceInfo(getCurrentDevice());
@@ -291,6 +298,10 @@ void buttonHandler() {
 }
 
 void adjustMenuLevel(bool increment) {
+  if (menu_choice.current_floor == Data) {
+    sendAllData();
+    return;
+  }
   if (increment and menu_level != 4) {
     menu_level = menu_level + 1;
   } else if (!increment and menu_level != 0) {
@@ -387,9 +398,9 @@ void adjustDeviceValue(int increment) {
     case level:
       (*current_device).level = (*current_device).level + increment;
       if ((*current_device).level < 0) {
-        (*current_device).level = 0;
-      } else if ((*current_device).level > 100) {
         (*current_device).level = 100;
+      } else if ((*current_device).level > 100) {
+        (*current_device).level = 0;
       }
     default:
       break;
