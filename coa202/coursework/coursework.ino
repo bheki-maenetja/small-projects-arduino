@@ -31,7 +31,8 @@ typedef enum room {
 
 typedef enum device_type { 
   light = 0, 
-  heat = 1 
+  heat = 1,
+  lamp = 2 
 };
 
 typedef enum action {
@@ -63,7 +64,7 @@ typedef struct menu_selection {
   room current_room = 0;
   int num_rooms = 6;
   device_type current_device = 0;
-  int num_devices = 2;
+  int num_devices = 3;
   action current_action = 0;
   int num_actions = 3;
 };
@@ -71,7 +72,7 @@ typedef struct menu_selection {
 menu_state menu_level;
 menu_selection menu_choice;
 
-device homeDevices[12];
+device homeDevices[18];
 
 void setup() {
   // put your setup code here, to run once:
@@ -90,8 +91,8 @@ void loop() {
 }
 
 void setUpHouse() {
-  for (int i = 0; i < 12; i++) {
-    if (i < 6) {
+  for (int i = 0; i < 18; i++) {
+    if (i < 9) {
       homeDevices[i].house_floor = Ground;
       homeDevices[i].floor_room = i % 3;
     } else {
@@ -99,10 +100,12 @@ void setUpHouse() {
       homeDevices[i].floor_room = (i % 3) + 3;
     }
 
-    if (i % 2 == 0) {
-        homeDevices[i].type = light;
+    if (i % 9 > 5) {
+      homeDevices[i].type = 2;
+    } else if (i % 9 < 3) {
+      homeDevices[i].type = 0;
     } else {
-        homeDevices[i].type = heat;
+      homeDevices[i].type = 1;
     }
   } 
 }
@@ -116,7 +119,7 @@ String getFloorName(house_floor floor) {
       return "First";
       break;
     case Data:
-      return "Send Data";
+      return "Export";
       break;
     default:
       return "";
@@ -131,6 +134,9 @@ String getTypeName(device_type device) {
       break;
     case heat:
       return "Heat";
+      break;
+    case lamp:
+      return "Lamp";
       break;
     default:
       return "";
@@ -216,8 +222,15 @@ void getMenuState(menu_state state) {
   }
 }
 
-String getDeviceName() {
-  return "Main";
+String getDeviceName(device_type device) {
+  switch (device) {
+    case lamp:
+      return "Table";
+      break;
+    default:
+      return "Main";
+      break;
+  }
 }
 
 void printDeviceInfo(device *home_device) {
@@ -225,33 +238,33 @@ void printDeviceInfo(device *home_device) {
     getFloorName((*home_device).house_floor) + "/" 
     + getRoomName((*home_device).floor_room) + "/" 
     + getTypeName((*home_device).type) + "/" 
-    + getDeviceName() + "/"
+    + getDeviceName((*home_device).type) + "/"
     + "On: " + calculateTime((*home_device).on_time) 
   );
   Serial.println(
     getFloorName((*home_device).house_floor) + "/" 
     + getRoomName((*home_device).floor_room) + "/" 
     + getTypeName((*home_device).type) + "/" 
-    + getDeviceName() + "/"
+    + getDeviceName((*home_device).type) + "/"
     + "Off: " + calculateTime((*home_device).off_time) 
   );
   Serial.println(
     getFloorName((*home_device).house_floor) + "/" 
     + getRoomName((*home_device).floor_room) + "/" 
     + getTypeName((*home_device).type) + "/" 
-    + getDeviceName() + "/"
+    + getDeviceName((*home_device).type) + "/"
     + "Level: " + (*home_device).level 
   );
 }
 
 void sendAllData() {
-  for (int i = 0; i < 12; i++) {
+  for (int i = 0; i < 18; i++) {
     printDeviceInfo(&homeDevices[i]);
   }
 }
 
 device* getCurrentDevice() {
-  for (int i = 0; i < 12; i++) {
+  for (int i = 0; i < 18; i++) {
     bool deviceFound = homeDevices[i].house_floor == menu_choice.current_floor 
                        && homeDevices[i].floor_room == menu_choice.current_room
                        && homeDevices[i].type == menu_choice.current_device;
@@ -259,6 +272,7 @@ device* getCurrentDevice() {
        return &homeDevices[i];  
     }
   }
+  Serial.println("Not found");
 }
 
 
