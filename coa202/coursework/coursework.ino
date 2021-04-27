@@ -83,11 +83,15 @@ void setup() {
   Serial.println("BASIC");
   menu_level = 0;
   getMenuState(menu_level);
+  Serial.setTimeout(10);
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
   buttonHandler();
+  if (Serial.readString() == "Q") {
+    sendAllData();
+  }
 }
 
 void setUpHouse() {
