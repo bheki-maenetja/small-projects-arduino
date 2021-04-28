@@ -2,7 +2,6 @@
 #include <Wire.h>
 #include <Adafruit_RGBLCDShield.h>
 #include <utility/Adafruit_MCP23017.h>
-#include <string.h>
 
 Adafruit_RGBLCDShield lcd = Adafruit_RGBLCDShield ();
 
@@ -13,6 +12,12 @@ Adafruit_RGBLCDShield lcd = Adafruit_RGBLCDShield ();
 #define BLUE 0x4
 #define VIOLET 0x5
 #define WHITE 0x7
+
+#ifdef __arm__
+extern "C" char* sbrk(int incr); 
+#else // __ARM__
+extern char *__brkval;
+#endif // __arm__
 
 typedef enum house_floor { 
   Ground = 0, 
@@ -89,8 +94,13 @@ void setup() {
 void loop() {
   // put your main code here, to run repeatedly:
   buttonHandler();
-  if (Serial.readString() == "Q") {
+  String incoming = Serial.readString();
+  if (incoming == "Q") {
     sendAllData();
+  } else if (incoming == "M") {
+    Serial.print("Available RAM: ");
+    Serial.print(getFreeMemory());
+    Serial.print(" kb\n");  
   }
 }
 
@@ -439,4 +449,15 @@ String calculateTime(int minutes) {
   } else {
       return (String) hour_value + ":" + (String) minute_value;
   }
+}
+
+int getFreeMemory() {
+  char top;
+  #ifdef __arm__
+    return &top - reinterpret_cast<char*>(sbrk(0));
+  #elif defined(CORE_TEENSY) || (ARDUINO > 103 && ARDUINO != 151)
+    return &top - __brkval;
+  #else  // __arm__
+    return __brkval ? &top - __brkval : &top - __malloc_heap_start;
+  #endif  // __arm__
 }
