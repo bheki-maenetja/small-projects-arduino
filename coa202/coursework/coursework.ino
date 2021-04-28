@@ -22,7 +22,8 @@ extern char *__brkval;
 typedef enum house_floor { 
   Ground = 0, 
   First = 1,
-  Data = 2
+  Outside = 2,
+  Data = 3
 };
 
 typedef enum room { 
@@ -31,13 +32,16 @@ typedef enum room {
   hall = 2,
   bathroom = 3,
   bedroom_1 = 4,
-  bedroom_2 = 5 
+  bedroom_2 = 5,
+  garden = 6,
+  garage = 7 
 };
 
 typedef enum device_type { 
   light = 0, 
   heat = 1,
-  lamp = 2 
+  lamp = 2,
+  water = 3 
 };
 
 typedef enum action {
@@ -65,11 +69,11 @@ typedef enum menu_state {
 
 typedef struct menu_selection {
   house_floor current_floor = 0;
-  int num_floors = 3;
+  int num_floors = 4;
   room current_room = 0;
   int num_rooms = 6;
   device_type current_device = 0;
-  int num_devices = 3;
+  int num_devices = 4;
   action current_action = 0;
   int num_actions = 3;
 };
@@ -77,7 +81,7 @@ typedef struct menu_selection {
 menu_state menu_level;
 menu_selection menu_choice;
 
-device homeDevices[18];
+device homeDevices[20];
 
 void setup() {
   // put your setup code here, to run once:
@@ -85,7 +89,7 @@ void setup() {
   lcd.begin(16, 2);
   setUpHouse();
   delay(100);
-  Serial.println("BASIC");
+  Serial.println("ENHANCED: LAMP, OUTSIDE, QUERY, MEMORY");
   menu_level = 0;
   getMenuState(menu_level);
   Serial.setTimeout(10);
@@ -100,21 +104,26 @@ void loop() {
   } else if (incoming == "M") {
     Serial.print("Available RAM: ");
     Serial.print(getFreeMemory());
-    Serial.print(" kb\n");  
+    Serial.print(" bytes\n");  
   }
 }
 
 void setUpHouse() {
-  for (int i = 0; i < 18; i++) {
+  for (int i = 0; i < 20; i++) {
     if (i < 9) {
       homeDevices[i].house_floor = Ground;
       homeDevices[i].floor_room = i % 3;
-    } else {
+    } else if (i < 18) {
       homeDevices[i].house_floor = First;
       homeDevices[i].floor_room = (i % 3) + 3;
+    } else {
+      homeDevices[i].house_floor = Outside;
+      homeDevices[i].floor_room = i - 12;
     }
 
-    if (i % 9 > 5) {
+    if (i == 18) {
+      homeDevices[i].type = 3;
+    } else if (i % 9 > 5) {
       homeDevices[i].type = 2;
     } else if (i % 9 < 3) {
       homeDevices[i].type = 0;
@@ -131,6 +140,9 @@ String getFloorName(house_floor floor) {
       break;
     case First:
       return "First";
+      break;
+    case Outside:
+      return "Outside";
       break;
     case Data:
       return "Export";
@@ -151,6 +163,9 @@ String getTypeName(device_type device) {
       break;
     case lamp:
       return "Lamp";
+      break;
+    case water:
+      return "Water";
       break;
     default:
       return "";
@@ -177,6 +192,12 @@ String getRoomName(room room) {
       break;
     case bedroom_2:
       return "bedroom 2";
+      break;
+    case garden:
+      return "garden";
+      break;
+    case garage:
+      return "garage";
       break;
     default:
       return "";
@@ -272,13 +293,13 @@ void printDeviceInfo(device *home_device) {
 }
 
 void sendAllData() {
-  for (int i = 0; i < 18; i++) {
+  for (int i = 0; i < 20; i++) {
     printDeviceInfo(&homeDevices[i]);
   }
 }
 
 device* getCurrentDevice() {
-  for (int i = 0; i < 18; i++) {
+  for (int i = 0; i < 20; i++) {
     bool deviceFound = homeDevices[i].house_floor == menu_choice.current_floor 
                        && homeDevices[i].floor_room == menu_choice.current_room
                        && homeDevices[i].type == menu_choice.current_device;
@@ -347,12 +368,7 @@ void adjustMenuChoice(int increment) {
       adjustRoom(increment);
       break;
     case devices:
-      menu_choice.current_device = menu_choice.current_device + increment;
-      if (menu_choice.current_device < 0) {
-        menu_choice.current_device = menu_choice.num_devices - 1;
-      } else if (menu_choice.current_device >= menu_choice.num_devices) {
-        menu_choice.current_device = 0;
-      }
+      adjustDeviceType(increment);
       break;
     case actions:
       menu_choice.current_action = menu_choice.current_action + increment;
@@ -381,8 +397,13 @@ void adjustFloor(int increment) {
 
   if (menu_choice.current_floor == 0) {
     menu_choice.current_room = 0;
+    menu_choice.current_device = 0;
   } else if (menu_choice.current_floor == 1) {
     menu_choice.current_room = 3;
+    menu_choice.current_device = 0;
+  } else if (menu_choice.current_floor == 2) {
+    menu_choice.current_room = 6;
+    menu_choice.current_device = 3;
   }
 }
 
@@ -395,12 +416,33 @@ void adjustRoom(int increment) {
   } else if (menu_choice.current_floor == 1) {
     min_value = 3;
     max_value = 5; 
+  } else if (menu_choice.current_floor == 2) {
+    min_value = 6;
+    max_value = 7;
   }
 
   if (menu_choice.current_room < min_value) {
     menu_choice.current_room = max_value;
   } else if (menu_choice.current_room > max_value) {
     menu_choice.current_room = min_value;
+  }
+
+  if (menu_choice.current_room == 6) {
+    menu_choice.current_device = 3;
+  } else if (menu_choice.current_room == 7) {
+    menu_choice.current_device = 0;
+  }
+}
+
+void adjustDeviceType(int increment) {
+  if (menu_choice.current_room == 6 || menu_choice.current_room == 7) {
+    return;
+  }
+  menu_choice.current_device = menu_choice.current_device + increment;
+  if (menu_choice.current_device < 0) {
+      menu_choice.current_device = menu_choice.num_devices - 1;
+  } else if (menu_choice.current_device >= menu_choice.num_devices) {
+      menu_choice.current_device = 0;
   }
 }
 
