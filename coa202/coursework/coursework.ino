@@ -168,28 +168,28 @@ String getTypeName(device_type device) {
 String getRoomName(room room) {
   switch (room) {
     case kitchen:
-      return "kitchen";
+      return "Kitchen";
       break;
     case living_room:
-      return "living room";
+      return "Lounge";
       break;
     case hall:
-      return "hall";
+      return "Hall";
       break;
     case bathroom:
-      return "bathroom";
+      return "Bathroom";
       break;
     case bedroom_1:
-      return "bedroom 1";
+      return "Bedroom 1";
       break;
     case bedroom_2:
-      return "bedroom 2";
+      return "Bedroom 2";
       break;
     case garden:
-      return "garden";
+      return "Garden";
       break;
     case garage:
-      return "garage";
+      return "Garage";
       break;
     default:
       return "";
@@ -200,13 +200,13 @@ String getRoomName(room room) {
 String getActionName(action action) {
   switch(action) {
     case on_time:
-      return "On time";
+      return "on time";
       break;
     case off_time:
-      return "Off time";
+      return "off time";
       break;
     case level:
-      return "Level";
+      return "level";
       break;
     default:
       return "";
@@ -218,16 +218,16 @@ void getMenuState(menu_state state) {
   lcd.clear();
   switch(state) {
     case floors:
-      lcd.print("Floor: " + getFloorName(menu_choice.current_floor));
+      lcd.print("FLOOR: " + getFloorName(menu_choice.current_floor));
       break;
     case rooms:
-      lcd.print("Room: " + getRoomName(menu_choice.current_room));
+      lcd.print("ROOM: " + getRoomName(menu_choice.current_room));
       break;
     case devices:
-      lcd.print("Device: " + getTypeName(menu_choice.current_device));
+      lcd.print("DEVICE: " + getTypeName(menu_choice.current_device));
       break;
     case actions:
-      lcd.print("Action: " + getActionName(menu_choice.current_action));
+      lcd.print("ACTION: " + getActionName(menu_choice.current_action));
       break;
     case values:
       lcd.print(getActionName(menu_choice.current_action) + ": ");
