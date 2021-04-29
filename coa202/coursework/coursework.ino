@@ -5,14 +5,6 @@
 
 Adafruit_RGBLCDShield lcd = Adafruit_RGBLCDShield ();
 
-#define RED 0x1
-#define YELLOW 0x3
-#define GREEN 0x2
-#define TEAL 0x6
-#define BLUE 0x4
-#define VIOLET 0x5
-#define WHITE 0x7
-
 #ifdef __arm__
 extern "C" char* sbrk(int incr); 
 #else // __ARM__
@@ -440,8 +432,8 @@ void adjustDeviceType(int increment) {
   }
   menu_choice.current_device = menu_choice.current_device + increment;
   if (menu_choice.current_device < 0) {
-      menu_choice.current_device = menu_choice.num_devices - 1;
-  } else if (menu_choice.current_device >= menu_choice.num_devices) {
+      menu_choice.current_device = menu_choice.num_devices - 2;
+  } else if (menu_choice.current_device >= menu_choice.num_devices - 1) {
       menu_choice.current_device = 0;
   }
 }
