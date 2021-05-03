@@ -1,4 +1,4 @@
-// Boilerplate code for a new project
+// #define DEBUG
 #include <Wire.h>
 #include <Adafruit_RGBLCDShield.h>
 #include <utility/Adafruit_MCP23017.h>
@@ -323,7 +323,10 @@ void buttonHandler() {
       } else if (buttons & BUTTON_DOWN) {
         adjustMenuChoice(-1);
       } else if (buttons & BUTTON_SELECT) {
+        #ifdef DEBUG
         printDeviceInfo(getCurrentDevice());
+        #else
+        #endif
       }
     } else if (isPressed) {
       currentTime = millis();
