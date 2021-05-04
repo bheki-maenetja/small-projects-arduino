@@ -96,7 +96,8 @@ void loop() {
   } else if (incoming == "M") {
     Serial.print("Available RAM: ");
     Serial.print(getFreeMemory());
-    Serial.print(" bytes\n");  
+    Serial.print(" bytes\n");
+    Serial.print("Number of devices: 20\n");  
   }
 }
 
@@ -299,7 +300,10 @@ device* getCurrentDevice() {
        return &homeDevices[i];  
     }
   }
-  Serial.println("Not found");
+  #ifdef DEBUG
+  Serial.println("Device Not found");
+  #else
+  #endif
 }
 
 
