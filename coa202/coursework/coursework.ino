@@ -72,7 +72,6 @@ typedef struct menu_selection {
 
 menu_state menu_level;
 menu_selection menu_choice;
-
 device homeDevices[20];
 
 void setup() {
@@ -88,7 +87,6 @@ void setup() {
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
   buttonHandler();
   String incoming = Serial.readString();
   if (incoming == "Q") {
