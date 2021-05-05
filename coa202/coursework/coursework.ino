@@ -1,4 +1,4 @@
-// #define DEBUG
+ #define DEBUG
 #include <Wire.h>
 #include <Adafruit_RGBLCDShield.h>
 #include <utility/Adafruit_MCP23017.h>
@@ -218,15 +218,31 @@ void getMenuState(menu_state state) {
   switch(state) {
     case floors:
       lcd.print("FLOOR: " + getFloorName(menu_choice.current_floor));
+      #ifdef DEBUG
+      Serial.println("Current Floor: " + getFloorName(menu_choice.current_floor));
+      #else
+      #endif
       break;
     case rooms:
       lcd.print("ROOM: " + getRoomName(menu_choice.current_room));
+      #ifdef DEBUG
+      Serial.println("Current Room: " + getRoomName(menu_choice.current_room));
+      #else
+      #endif
       break;
     case devices:
       lcd.print("DEVICE: " + getTypeName(menu_choice.current_device));
+      #ifdef DEBUG
+      Serial.println("Current Device: " + getTypeName(menu_choice.current_device));
+      #else
+      #endif
       break;
     case actions:
       lcd.print("ACTION: " + getActionName(menu_choice.current_action));
+      #ifdef DEBUG
+      Serial.println("Current Action: " + getActionName(menu_choice.current_action));
+      #else
+      #endif
       break;
     case values:
       lcd.print(getActionName(menu_choice.current_action) + ": ");
@@ -295,6 +311,10 @@ device* getCurrentDevice() {
                        && homeDevices[i].floor_room == menu_choice.current_room
                        && homeDevices[i].type == menu_choice.current_device;
     if (deviceFound) {
+       #ifdef DEBUG
+       Serial.println("Device Found");
+       #else
+       #endif
        return &homeDevices[i];  
     }
   }
@@ -331,10 +351,13 @@ void buttonHandler() {
         #endif
       }
     } else if (isPressed) {
+      #ifdef DEBUG
       currentTime = millis();
       if ((currentTime - pressedTime) > 2000) {
         Serial.println("Holding");
       }
+      #else
+      #endif
     }
   } else {
     pressedTime = 0;
