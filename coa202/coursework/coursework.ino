@@ -1,4 +1,4 @@
- #define DEBUG
+//#define DEBUG
 #include <Wire.h>
 #include <Adafruit_RGBLCDShield.h>
 #include <utility/Adafruit_MCP23017.h>
@@ -219,28 +219,28 @@ void getMenuState(menu_state state) {
     case floors:
       lcd.print("FLOOR: " + getFloorName(menu_choice.current_floor));
       #ifdef DEBUG
-      Serial.println("Current Floor: " + getFloorName(menu_choice.current_floor));
+      Serial.println("FLOOR: " + getFloorName(menu_choice.current_floor));
       #else
       #endif
       break;
     case rooms:
       lcd.print("ROOM: " + getRoomName(menu_choice.current_room));
       #ifdef DEBUG
-      Serial.println("Current Room: " + getRoomName(menu_choice.current_room));
+      Serial.println("ROOM: " + getRoomName(menu_choice.current_room));
       #else
       #endif
       break;
     case devices:
       lcd.print("DEVICE: " + getTypeName(menu_choice.current_device));
       #ifdef DEBUG
-      Serial.println("Current Device: " + getTypeName(menu_choice.current_device));
+      Serial.println("DEVICE: " + getTypeName(menu_choice.current_device));
       #else
       #endif
       break;
     case actions:
       lcd.print("ACTION: " + getActionName(menu_choice.current_action));
       #ifdef DEBUG
-      Serial.println("Current Action: " + getActionName(menu_choice.current_action));
+      Serial.println("ACTION: " + getActionName(menu_choice.current_action));
       #else
       #endif
       break;
@@ -311,10 +311,6 @@ device* getCurrentDevice() {
                        && homeDevices[i].floor_room == menu_choice.current_room
                        && homeDevices[i].type == menu_choice.current_device;
     if (deviceFound) {
-       #ifdef DEBUG
-       Serial.println("Device Found");
-       #else
-       #endif
        return &homeDevices[i];  
     }
   }
